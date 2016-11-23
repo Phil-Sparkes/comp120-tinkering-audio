@@ -30,29 +30,16 @@ def sineWave(frequency, volume, attack_time, sustain_time, release_time):
     interval = 1.0 / frequency
     samplesPerCycle = interval * samplingRate
     maxCycle = 2 * math.pi
-
-    for pos in range(attack_time):
-        volumechange += (float(volume) / float(attack_time))
+    for pos in range(len(buildSin)):
+        if attack_time >= pos:
+            volumechange += (float(volume) / float(attack_time))
+        if (attack_time + sustain_time) <= pos:
+            volumechange -= (float(volume) / float(release_time))
         rawSample = math.sin((pos / samplesPerCycle) * maxCycle)
         sampleVal = int(volumechange * rawSample)
         packaged_value = struct.pack("<h", sampleVal)
         for j in xrange(Channels):
             values.append(packaged_value)
-    for pos in range(sustain_time):
-        rawSample = math.sin((pos / samplesPerCycle) * maxCycle)
-        sampleVal = int(volumechange * rawSample)
-        packaged_value = struct.pack("<h", sampleVal)
-        for j in xrange(Channels):
-            values.append(packaged_value)
-    volumechange = 0
-    for pos in range(release_time):
-        volumechange += (float(volume) / float(release_time))
-        rawSample = math.sin((pos / samplesPerCycle) * maxCycle)
-        sampleVal = ((int(volume-volumechange)) * rawSample)
-        packaged_value = struct.pack("<h", sampleVal)
-        for j in xrange(Channels):
-            values.append(packaged_value)
-
     value_str = ''.join(values)
     noise_out.writeframes(value_str)
     return buildSin
@@ -68,19 +55,27 @@ notes = {'a': 440.0 * 2.0 ** (0 / 12.0),
         'f': 440.0 * 2.0 ** (8 / 12.0),
         'f#': 440.0 * 2.0 ** (9 / 12.0),
         'g': 440.0 * 2.0 ** (10 / 12.0),
-        'g#': 440.0 * 2.0 ** (11 / 12.0)}
+        'g#': 440.0 * 2.0 ** (11 / 12.0),
+         'a2': 440.0 * 2.0 ** (12 / 12.0)}
 
+note_time = 0.4
+attacktime = int((0.1  * note_time) * 44100)
+sustaintime = int((0.6  * note_time) * 44100)
+decaytime = int((0.3  * note_time) * 44100)
 
-attacktime = int(0.1 * 44100)
-sustaintime = int(0.6 * 44100)
-decaytime = int(0.3 * 44100)
 volumenote = 8000
 
-playnotes = ['c','c','g','g','a','a','g','f','f','e','e','d','d','c','g','g','f','f','e','e','d','g','g','f','f','e','e','d']
+
+playnotes = ['c','c','g','g','a2','a2','g','f','f','e','e','d','d','c','g','g','f','f','e','e','d','g','g','f','f','e','e','d']
 freqnote = 440.0 * 2.0 ** (notes['g'] / 12.0)
 
 for note in range(len(playnotes)):
     sineWave(notes[playnotes[note]], volumenote, attacktime, sustaintime, decaytime)
+    #note_time = random.choice([0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
+    #attacktime = int((0.1 * note_time) * 44100)
+    #sustaintime = int((0.6 * note_time) * 44100)
+    #decaytime = int((0.3 * note_time) * 44100)
+    #sineWave(notes[random.choice(['a', 'a#', 'b', 'c', 'c#', 'd', 'd#', 'e','f', 'f#', 'g', 'g#'])], volumenote, attacktime, sustaintime, decaytime)
 
 
 
