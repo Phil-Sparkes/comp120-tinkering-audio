@@ -2,7 +2,7 @@ import wave
 import struct
 
 noise_out = wave.open('noise2.wav', 'w')
-soundWave = wave.open('noise.wav', 'r')
+soundWave = wave.open('noise99.wav', 'r')
 # mode must be 'r', 'rb', 'w', or 'wb'
 
 length = soundWave.getnframes()
@@ -25,7 +25,6 @@ def echo(sndFile, delay):
     Channels = 1
     s1 = sndFile
     s2 = sndFile
-    print len(s1)
     for index in range(delay, len(s1)):
         echo = 0.6*s2[index-delay]
         combo = s1[index] + echo
@@ -47,16 +46,32 @@ def double(source):
     for sourceIndex in range(0, length, 2):
         value = source[sourceIndex]
         target[targetIndex] = value
-        targetIndex += 1
         packaged_value = struct.pack("<h", target[targetIndex])
+        targetIndex += 1
         for j in xrange(Channels):
             values.append(packaged_value)
     value_str = ''.join(values)
     noise_out.writeframes(value_str)
     noise_out.close()
-    print target
     return target
 
+def half(source):
+    values = []
+    Channels = 2
+    length = len(source)* 2
+    target = [0] * length
+    sourceIndex = 0
+    for targetIndex in range(0, length):
+        value = source[int(sourceIndex)]
+        target[targetIndex] = value
+        packaged_value = struct.pack("<h", target[targetIndex])
+        sourceIndex = sourceIndex + 0.5
+        for j in xrange(Channels):
+            values.append(packaged_value)
+    value_str = ''.join(values)
+    noise_out.writeframes(value_str)
+    noise_out.close()
+    return target
 
 def increase_volume(frames, length):
     """Doubles the volume"""
@@ -84,8 +99,9 @@ def count_sign_changes():
 
 BitDepth = 2**15 - 1
 Volume = float(max()) / float(BitDepth)
-echo(frames, 300)
+#echo(frames, 300)
 #double(frames)
+half(frames)
 
 #print frames
 #print Volume
