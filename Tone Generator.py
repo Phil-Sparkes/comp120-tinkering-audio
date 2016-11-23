@@ -16,7 +16,8 @@ print noise_out.getparams()
 
 Sample_Length = noise_out.getframerate()
 Channels = noise_out.getnchannels()
-Frequency = 8000
+print Channels
+Frequency = 2000
 Sample_Rate = Sample_Length
 Volume = 0.5
 Bit_Depth = 2**15 - 1
@@ -24,7 +25,6 @@ Bit_Depth = 2**15 - 1
 for i in xrange(Sample_Length):
     value = math.sin(2.0 * math.pi * Frequency * (i / 44100.0)) * (Volume * Bit_Depth)
     print value
-
     packaged_value = struct.pack("<h",value)
 
     for j in xrange(Channels):
