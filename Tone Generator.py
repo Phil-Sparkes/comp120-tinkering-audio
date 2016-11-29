@@ -1,6 +1,7 @@
 import wave
 import struct
 import math
+import random
 
 # Creates a file to write to
 noise_out = wave.open('noise.wav', 'w')
@@ -69,28 +70,35 @@ notes = {
     'a2': 440.0 * 2.0 ** (12 / 12.0)
 }
 
-# Sets the length of the note in seconds
-note_time = 0.4
-# sets the percentage of the notes attack, sustain and decay times, values add up to 1
-attacktime = int((0.1 * note_time) * 44100)
-sustaintime = int((0.6 * note_time) * 44100)
-decaytime = int((0.3 * note_time) * 44100)
-
 # sets the volume
-volumenote = 8000
+note_volume = 8000
 
-# Twinkle Twikle in list form
-playnotes = ['c', 'c', 'g', 'g', 'a2', 'a2', 'g', 'f', 'f', 'e', 'e', 'd', 'd', 'c', 'g', 'g', 'f', 'f', 'e', 'e', 'd', 'g', 'g', 'f', 'f', 'e', 'e', 'd']
 
-# creates the notes
-for note in range(len(playnotes)):
-    sine_wave(notes[playnotes[note]], volumenote, attacktime, sustaintime, decaytime)
+def twinkle():
+    """" Generates twinkle twinkle little star"""
+    # Sets the length of the note in seconds
+    note_time = 0.4
 
-    # this part is for random notes and random times played for can uncomment if want to try
-    """
-    note_time = random.choice([0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
+    # sets the percentage of the notes attack, sustain and decay times, values add up to 1
     attacktime = int((0.1 * note_time) * 44100)
     sustaintime = int((0.6 * note_time) * 44100)
     decaytime = int((0.3 * note_time) * 44100)
-    sine_wave(notes[random.choice(['a', 'a#', 'b', 'c', 'c#', 'd', 'd#', 'e','f', 'f#', 'g', 'g#'])], volumenote, attacktime, sustaintime, decaytime)
-    """
+
+    # Twinkle in list form
+    playnotes = ['c', 'c', 'g', 'g', 'a2', 'a2', 'g', 'f', 'f', 'e', 'e', 'd', 'd', 'c', 'g', 'g', 'f', 'f', 'e', 'e', 'd', 'g', 'g', 'f', 'f', 'e', 'e', 'd']
+
+    # creates the notes
+    for note in range(len(playnotes)):
+        sine_wave(notes[playnotes[note]], note_volume, attacktime, sustaintime, decaytime)
+
+
+def random_tune():
+    """ Generates a random tune"""
+    for note in range(10):
+        note_time = random.choice([0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
+        attacktime = int((0.1 * note_time) * 44100)
+        sustaintime = int((0.6 * note_time) * 44100)
+        decaytime = int((0.3 * note_time) * 44100)
+        sine_wave(notes[random.choice(['a', 'a#', 'b', 'c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#'])], note_volume, attacktime, sustaintime, decaytime)
+
+twinkle()

@@ -11,81 +11,83 @@ frames = []
 params = soundWave.getparams()
 noise_out.setparams(params)
 
-
-
 for i in xrange(length):
-    waveData = soundWave.readframes(1)
-    data = struct.unpack("<h", waveData)
+    wave_data = soundWave.readframes(1)
+    data = struct.unpack("<h", wave_data)
     frames.append(int(data[0]))
 
 
-
-def echo(sndFile, delay):
+def create_echo(sound_file, delay):
     values = []
-    Channels = 1
-    s1 = sndFile
-    s2 = sndFile
+    channels = 1
+    s1 = sound_file
+    s2 = sound_file
     for index in range(delay, len(s1)):
         echo = 0.6*s2[index-delay]
         combo = s1[index] + echo
         s1[index] = combo
         packaged_value = struct.pack("<h", s1[index])
-        for j in xrange(Channels):
+        for j in xrange(channels):
             values.append(packaged_value)
     value_str = ''.join(values)
     noise_out.writeframes(value_str)
     noise_out.close()
     return values
 
+
 def double(source):
     values = []
-    Channels = 2
+    channels = 2
     length = len(source) / 2 + 1
     target = [0] * length
-    targetIndex = 0
-    for sourceIndex in range(0, length, 2):
-        value = source[sourceIndex]
-        target[targetIndex] = value
-        packaged_value = struct.pack("<h", target[targetIndex])
-        targetIndex += 1
-        for j in xrange(Channels):
+    target_index = 0
+    for source_index in range(0, length, 2):
+        value = source[source_index]
+        target[target_index] = value
+        packaged_value = struct.pack("<h", target[target_index])
+        target_index += 1
+        for j in xrange(channels):
             values.append(packaged_value)
     value_str = ''.join(values)
     noise_out.writeframes(value_str)
     noise_out.close()
     return target
 
+
 def half(source):
     values = []
-    Channels = 2
-    length = len(source)* 2
+    channels = 2
+    length = len(source) * 2
     target = [0] * length
-    sourceIndex = 0
-    for targetIndex in range(0, length):
-        value = source[int(sourceIndex)]
-        target[targetIndex] = value
-        packaged_value = struct.pack("<h", target[targetIndex])
-        sourceIndex = sourceIndex + 0.5
-        for j in xrange(Channels):
+    source_index = 0
+    for target_index in range(0, length):
+        value = source[int(source_index)]
+        target[target_index] = value
+        packaged_value = struct.pack("<h", target[target_index])
+        source_index += 0.5
+        for j in xrange(channels):
             values.append(packaged_value)
     value_str = ''.join(values)
     noise_out.writeframes(value_str)
     noise_out.close()
     return target
+
 
 def increase_volume(frames, length):
     """Doubles the volume"""
     for i in xrange(length):
         frames[i] *= 2
 
-def max():
+
+def highest_value():
     """finds the highest value"""
-    maxnum = 0
+    maximum_number = 0
     for i in xrange(length):
         challenger = frames[i]
-        if abs(challenger) > maxnum:
-            maxnum = abs(challenger)
-    return maxnum
+        if abs(challenger) > maximum_number:
+            maximum_number = abs(challenger)
+    return maximum_number
+
 
 def count_sign_changes():
     """checks how many 0s"""
@@ -93,19 +95,12 @@ def count_sign_changes():
     for i in xrange(length):
         if frames[i] == 0:
             numzero += 1
-    numzero = numzero/3    # 3 seconds
-    numzero = numzero/2
+    numzero /= 3    # 3 seconds
+    numzero /= 2
     return numzero
 
 BitDepth = 2**15 - 1
 Volume = float(max()) / float(BitDepth)
-#echo(frames, 300)
-#double(frames)
+create_echo(frames, 300)
+double(frames)
 half(frames)
-
-#print frames
-#print Volume
-#print count_sign_changes()
-#increase_volume(frames, length)
-
-
