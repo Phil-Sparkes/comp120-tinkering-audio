@@ -2,7 +2,7 @@ import wave
 import struct
 
 noise_out = wave.open('noise2.wav', 'w')
-soundWave = wave.open('noise99.wav', 'r')
+soundWave = wave.open('noise.wav', 'r')
 # mode must be 'r', 'rb', 'w', or 'wb'
 
 length = soundWave.getnframes()
@@ -21,7 +21,7 @@ def create_echo(sound_file, delay):
     values = []
     channels = 1
     s1 = sound_file
-    s2 = sound_file
+    s2 = sound_file[:]
     for index in range(delay, len(s1)):
         echo = 0.6*s2[index-delay]
         combo = s1[index] + echo
@@ -99,8 +99,8 @@ def count_sign_changes():
     numzero /= 2
     return numzero
 
-BitDepth = 2**15 - 1
-Volume = float(max()) / float(BitDepth)
-create_echo(frames, 300)
-double(frames)
-half(frames)
+#BitDepth = 2**15 - 1
+#Volume = float(max()) / float(BitDepth)
+create_echo(frames, 44100)
+#double(frames)
+#half(frames)
