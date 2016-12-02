@@ -3,6 +3,7 @@ import struct
 
 noise_out = wave.open('noise2.wav', 'w')
 soundWave = wave.open('Roomba.wav', 'r')
+
 # mode must be 'r', 'rb', 'w', or 'wb'
 
 length = soundWave.getnframes()
@@ -100,6 +101,8 @@ def count_sign_changes():
 
 #BitDepth = 2**15 - 1
 #Volume = float(max()) / float(BitDepth)
+
 create_echo(frames, 8000)
+
 #double(frames)
 #half(frames)
