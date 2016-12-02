@@ -27,7 +27,10 @@ def sine_wave(frequency, volume, attack_time, sustain_time, release_time):
     sampling_rate = 44100
 
     # creates an interval between samples
-    interval = 1.0 / frequency
+    if frequency == 0:
+        interval = 1
+    else:
+        interval = 1.0 / frequency
     samples_per_cycle = interval * sampling_rate
 
     # not sure what that one does
@@ -44,17 +47,16 @@ def sine_wave(frequency, volume, attack_time, sustain_time, release_time):
 
         # Creates the sample
         raw_sample = math.sin((pos / samples_per_cycle) * max_cycle)
-        sample_value = int(volume_change * raw_sample)
+        value = (int(volume_change * raw_sample))
+        values.append(value)
 
-        # Packages the and appends the sample
-        packaged_value = struct.pack("<h", sample_value)
-        for j in xrange(Channels):
-            values.append(packaged_value)
-    value_str = ''.join(values)
-    noise_out.writeframes(value_str)
+    # Returns the values
+    return values
+
 
 # Dictionary of notes
 notes = {
+    'BLANK': 0,
     'a': 440.0 * 2.0 ** (0 / 12.0),
     'a#': 440.0 * 2.0 ** (1 / 12.0),
     'b': 440.0 * 2.0 ** (2 / 12.0),
@@ -67,7 +69,7 @@ notes = {
     'f#': 440.0 * 2.0 ** (9 / 12.0),
     'g': 440.0 * 2.0 ** (10 / 12.0),
     'g#': 440.0 * 2.0 ** (11 / 12.0),
-    'a2': 440.0 * 2.0 ** (12 / 12.0)
+    'a2': 440.0 * 2.0 ** (12 / 12.0),
 }
 
 # sets the volume
@@ -78,6 +80,7 @@ def twinkle():
     """" Generates twinkle twinkle little star"""
     # Sets the length of the note in seconds
     note_time = 0.4
+    values = []
 
     # sets the percentage of the notes attack, sustain and decay times, values add up to 1
     attacktime = int((0.1 * note_time) * 44100)
@@ -85,11 +88,21 @@ def twinkle():
     decaytime = int((0.3 * note_time) * 44100)
 
     # Twinkle in list form
-    playnotes = ['c', 'c', 'g', 'g', 'a2', 'a2', 'g', 'f', 'f', 'e', 'e', 'd', 'd', 'c', 'g', 'g', 'f', 'f', 'e', 'e', 'd', 'g', 'g', 'f', 'f', 'e', 'e', 'd']
+    playnotes = ['c', 'c', 'g', 'g', 'a2', 'a2', 'g', 'BLANK', 'f', 'f', 'e', 'e', 'd', 'd', 'c', 'BLANK', 'g', 'g', 'f', 'f', 'e', 'e', 'd','BLANK', 'g', 'g', 'f', 'f', 'e', 'e', 'd']
 
     # creates the notes
     for note in range(len(playnotes)):
-        sine_wave(notes[playnotes[note]], note_volume, attacktime, sustaintime, decaytime)
+        note_values = sine_wave(notes[playnotes[note]], note_volume, attacktime, sustaintime, decaytime)
+
+        # Appends the list to include new notes
+        for i in xrange(len(note_values)):
+            values.append(note_values[i])
+        drum_values = drum_beat()
+        # Appends the list to include drum beat
+        for i in xrange(len(drum_values)):
+            values.append(drum_values[i])
+    # returns the list of values
+    return values
 
 
 def random_tune():
@@ -101,4 +114,25 @@ def random_tune():
         decaytime = int((0.3 * note_time) * 44100)
         sine_wave(notes[random.choice(['a', 'a#', 'b', 'c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#'])], note_volume, attacktime, sustaintime, decaytime)
 
-twinkle()
+def drum_beat():
+    """drum beat work in progress"""
+    values = []
+    for i in xrange(1000):
+        value = math.sin(2.0 * math.pi * 120 * (i/44100.0)) * (0.5 * (2 ** 15 - 1))
+        values.append(value)
+    return values
+
+def pack_values(values):
+    """Packages the and appends the values"""
+    output_values = []
+    for value in values:
+        packaged_value = struct.pack("<h", value)
+        for j in xrange(Channels):
+            output_values.append(packaged_value)
+    value_str = ''.join(output_values)
+    noise_out.writeframes(value_str)
+
+
+values = twinkle()
+pack_values(values)
+
