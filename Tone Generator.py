@@ -15,7 +15,7 @@ noise_out.setcomptype('NONE', 'not compressed')
 Channels = noise_out.getnchannels()
 
 
-def sine_wave(frequency, volume, attack_time, sustain_time, release_time):
+def sine_wave(frequency, volume, attack_time, decay_time, sustain_time, release_time):
     """Envelope function, plays a pure tone but fades into and out of it"""
     # Creates volume_change as a float
     volume_change = 0.00
@@ -37,12 +37,18 @@ def sine_wave(frequency, volume, attack_time, sustain_time, release_time):
     max_cycle = 2 * math.pi
 
     # loops for length of the pure tone
-    for pos in range((attack_time + sustain_time + release_time)):
+    for pos in range((attack_time + decay_time + sustain_time + release_time)):
         # Increases the volume from 0 when in attack time
         if attack_time >= pos:
             volume_change += (float(volume) / float(attack_time))
-        # Decreases the volume to 0 when in decay time
-        if (attack_time + sustain_time) <= pos:
+        # Assigns new value to volume to the sum of 2/3rds of the original value
+        if pos == attack_time:
+            volume = (float(volume) / 3.0) * 2.0
+        # Decreases the volume slightly to 2/3rds in decay time
+        if attack_time < pos < attack_time + decay_time:
+            volume_change -= (float(volume)/2.0)/decay_time
+            # Decreases the volume to 0 when in release time
+        if (attack_time + decay_time + sustain_time) <= pos:
             volume_change -= (float(volume) / float(release_time))
 
         # Creates the sample
@@ -84,15 +90,16 @@ def twinkle():
 
     # sets the percentage of the notes attack, sustain and decay times, values add up to 1
     attacktime = int((0.1 * note_time) * 44100)
+    decaytime = int((0.2 * note_time) * 44100)
     sustaintime = int((0.6 * note_time) * 44100)
-    decaytime = int((0.3 * note_time) * 44100)
+    releasetime = int((0.2 * note_time) * 44100)
 
     # Twinkle in list form
     playnotes = ['c', 'c', 'g', 'g', 'a2', 'a2', 'g', 'BLANK', 'f', 'f', 'e', 'e', 'd', 'd', 'c', 'BLANK', 'g', 'g', 'f', 'f', 'e', 'e', 'd','BLANK', 'g', 'g', 'f', 'f', 'e', 'e', 'd']
 
     # creates the notes
     for note in range(len(playnotes)):
-        note_values = sine_wave(notes[playnotes[note]], note_volume, attacktime, sustaintime, decaytime)
+        note_values = sine_wave(notes[playnotes[note]], note_volume, attacktime, decaytime, sustaintime, releasetime)
 
         # Appends the list to include new notes
         for i in xrange(len(note_values)):
