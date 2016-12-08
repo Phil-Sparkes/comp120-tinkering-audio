@@ -105,8 +105,8 @@ roomba = ['BLANK', 'c2', 'c2', 'd2', 'f2', 'd2', 'g2', 'g2',
 note_volume = 8000
 
 
-def twinkle():
-    """" Generates twinkle twinkle little star"""
+def play_notes(note_list):
+    """" plays the notes from a list"""
     # Sets the length of the note in seconds
     note_time = 0.4
     values = []
@@ -114,15 +114,13 @@ def twinkle():
     # sets the percentage of the notes attack, sustain and decay times, values add up to 1
     attacktime = int((0.1 * note_time) * 44100)
     decaytime = int((0.2 * note_time) * 44100)
-    sustaintime = int((0.6 * note_time) * 44100)
+    sustaintime = int((0.5 * note_time) * 44100)
     releasetime = int((0.2 * note_time) * 44100)
 
-    # Twinkle in list form
-    playnotes = ['c', 'c', 'g', 'g', 'a2', 'a2', 'g', 'BLANK', 'f', 'f', 'e', 'e', 'd', 'd', 'c', 'BLANK', 'g', 'g', 'f', 'f', 'e', 'e', 'd','BLANK', 'g', 'g', 'f', 'f', 'e', 'e', 'd']
-
     # creates the notes
-    for note in range(len(playnotes)):
-        note_values = sine_wave(notes[playnotes[note]], note_volume, attacktime, decaytime, sustaintime, releasetime)
+    for note in range(len(note_list)):
+
+        note_values = sine_wave(notes[note_list[note]], note_volume, attacktime, decaytime, sustaintime, releasetime)
 
         # Appends the list to include new notes
         for i in xrange(len(note_values)):
