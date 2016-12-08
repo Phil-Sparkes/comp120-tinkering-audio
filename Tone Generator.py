@@ -15,7 +15,9 @@ noise_out.setcomptype('NONE', 'not compressed')
 Channels = noise_out.getnchannels()
 
 
-def sine_wave(frequency, volume, attack_time, sustain_time, release_time):
+
+
+def sine_wave(frequency, volume, attack_time, decay_time, sustain_time, release_time):
     """Envelope function, plays a pure tone but fades into and out of it"""
     # Creates volume_change as a float
     volume_change = 0.00
@@ -37,12 +39,18 @@ def sine_wave(frequency, volume, attack_time, sustain_time, release_time):
     max_cycle = 2 * math.pi
 
     # loops for length of the pure tone
-    for pos in range((attack_time + sustain_time + release_time)):
+    for pos in range((attack_time + decay_time + sustain_time + release_time)):
         # Increases the volume from 0 when in attack time
         if attack_time >= pos:
             volume_change += (float(volume) / float(attack_time))
-        # Decreases the volume to 0 when in decay time
-        if (attack_time + sustain_time) <= pos:
+        # Assigns new value to volume to the sum of 2/3rds of the original value
+        if pos == attack_time:
+            volume = (float(volume) / 3.0) * 2.0
+        # Decreases the volume slightly to 2/3rds in decay time
+        if attack_time < pos < attack_time + decay_time:
+            volume_change -= (float(volume)/2.0)/decay_time
+            # Decreases the volume to 0 when in release time
+        if (attack_time + decay_time + sustain_time) <= pos:
             volume_change -= (float(volume) / float(release_time))
 
         # Creates the sample
@@ -57,42 +65,63 @@ def sine_wave(frequency, volume, attack_time, sustain_time, release_time):
 # Dictionary of notes
 notes = {
     'BLANK': 0,
-    'a': 440.0 * 2.0 ** (0 / 12.0),
-    'a#': 440.0 * 2.0 ** (1 / 12.0),
-    'b': 440.0 * 2.0 ** (2 / 12.0),
-    'c': 440.0 * 2.0 ** (3 / 12.0),
-    'c#': 440.0 * 2.0 ** (4 / 12.0),
-    'd': 440.0 * 2.0 ** (5 / 12.0),
-    'd#': 440.0 * 2.0 ** (6 / 12.0),
-    'e': 440.0 * 2.0 ** (7 / 12.0),
-    'f': 440.0 * 2.0 ** (8 / 12.0),
-    'f#': 440.0 * 2.0 ** (9 / 12.0),
-    'g': 440.0 * 2.0 ** (10 / 12.0),
-    'g#': 440.0 * 2.0 ** (11 / 12.0),
-    'a2': 440.0 * 2.0 ** (12 / 12.0),
+    'c1': 440.0 * 2.0 ** (-9 / 12.0),
+    'c1#': 440.0 * 2.0 ** (-8 / 12.0),
+    'd1': 440.0 * 2.0 ** (-7 / 12.0),
+    'd1#': 440.0 * 2.0 ** (-6 / 12.0),
+    'e1': 440.0 * 2.0 ** (-5 / 12.0),
+    'f1': 440.0 * 2.0 ** (-4 / 12.0),
+    'f1#': 440.0 * 2.0 ** (-3 / 12.0),
+    'g1': 440.0 * 2.0 ** (-2 / 12.0),
+    'g1#': 440.0 * 2.0 ** (-1 / 12.0),
+    'a2': 440.0 * 2.0 ** (0 / 12.0),
+    'a2#': 440.0 * 2.0 ** (1 / 12.0),
+    'b2': 440.0 * 2.0 ** (2 / 12.0),
+    'c2': 440.0 * 2.0 ** (3 / 12.0),
+    'c2#': 440.0 * 2.0 ** (4 / 12.0),
+    'd2': 440.0 * 2.0 ** (5 / 12.0),
+    'd2#': 440.0 * 2.0 ** (6 / 12.0),
+    'e2': 440.0 * 2.0 ** (7 / 12.0),
+    'f2': 440.0 * 2.0 ** (8 / 12.0),
+    'f2#': 440.0 * 2.0 ** (9 / 12.0),
+    'g2': 440.0 * 2.0 ** (10 / 12.0),
+    'g2#': 440.0 * 2.0 ** (11 / 12.0),
+    'a3': 440.0 * 2.0 ** (12 / 12.0),
+    'a3#': 440.0 * 2.0 ** (13 / 12.0),
+    'b3': 440.0 * 2.0 ** (14 / 12.0),
+    'c3': 440.0 * 2.0 ** (15 / 12.0),
 }
+
+# Twinkle in list form
+twinkle = ['c2', 'c2', 'g2', 'g2', 'a3', 'a3', 'g2',
+           'BLANK', 'f2', 'f2', 'e2', 'e2', 'd2', 'd2', 'c2',
+           'BLANK', 'g2', 'g2', 'f2', 'f2', 'e2', 'e2', 'd2',
+           'BLANK', 'g2', 'g2', 'f2', 'f2', 'e2', 'e2', 'd2']
+
+roomba = ['BLANK', 'c2', 'c2', 'd2', 'f2', 'd2', 'g2', 'g2',
+          'BLANK', 'c2', 'c2', 'a2', 'a2', 'b2', 'c2', 'd2',
+          'BLANK', 'e2', 'g2', 'f2', 'f2', 'g2', 'd2', 'd2']
 
 # sets the volume
 note_volume = 8000
 
 
-def twinkle():
-    """" Generates twinkle twinkle little star"""
+def play_notes(note_list):
+    """" plays the notes from a list"""
     # Sets the length of the note in seconds
     note_time = 0.4
     values = []
 
     # sets the percentage of the notes attack, sustain and decay times, values add up to 1
     attacktime = int((0.1 * note_time) * 44100)
-    sustaintime = int((0.6 * note_time) * 44100)
-    decaytime = int((0.3 * note_time) * 44100)
-
-    # Twinkle in list form
-    playnotes = ['c', 'c', 'g', 'g', 'a2', 'a2', 'g', 'BLANK', 'f', 'f', 'e', 'e', 'd', 'd', 'c', 'BLANK', 'g', 'g', 'f', 'f', 'e', 'e', 'd','BLANK', 'g', 'g', 'f', 'f', 'e', 'e', 'd']
+    decaytime = int((0.2 * note_time) * 44100)
+    sustaintime = int((0.5 * note_time) * 44100)
+    releasetime = int((0.2 * note_time) * 44100)
 
     # creates the notes
-    for note in range(len(playnotes)):
-        note_values = sine_wave(notes[playnotes[note]], note_volume, attacktime, sustaintime, decaytime)
+    for note in range(len(note_list)):
+
+        note_values = sine_wave(notes[note_list[note]], note_volume, attacktime, decaytime, sustaintime, releasetime)
 
         # Appends the list to include new notes
         for i in xrange(len(note_values)):
@@ -107,12 +136,22 @@ def twinkle():
 
 def random_tune():
     """ Generates a random tune"""
-    for note in range(10):
-        note_time = random.choice([0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
+
+    values = []
+
+    for note in range(40):
+        note_time = random.choice([0.2, 0.3, 0.4, 0.5])
         attacktime = int((0.1 * note_time) * 44100)
-        sustaintime = int((0.6 * note_time) * 44100)
-        decaytime = int((0.3 * note_time) * 44100)
-        sine_wave(notes[random.choice(['a', 'a#', 'b', 'c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#'])], note_volume, attacktime, sustaintime, decaytime)
+        decaytime = int((0.2 * note_time) * 44100)
+        sustaintime = int((0.5 * note_time) * 44100)
+        releasetime = int((0.2 * note_time) * 44100)
+        note_values = sine_wave(notes[random.choice(['a2', 'a2#', 'b2', 'c1', 'c1#', 'd1', 'd1#', 'e1', 'f1', 'f1#', 'g1', 'g1#', 'BLANK'])],
+                                 note_volume, attacktime, decaytime, sustaintime, releasetime)
+
+        for i in xrange(len(note_values)):
+            values.append(note_values[i])
+    return values
+
 
 def drum_beat():
     """drum beat work in progress"""
@@ -121,6 +160,7 @@ def drum_beat():
         value = math.sin(2.0 * math.pi * 120 * (i/44100.0)) * (0.5 * (2 ** 15 - 1))
         values.append(value)
     return values
+
 
 def pack_values(values):
     """Packages the and appends the values"""
@@ -132,7 +172,7 @@ def pack_values(values):
     value_str = ''.join(output_values)
     noise_out.writeframes(value_str)
 
-
-values = twinkle()
+#values = play_notes(roomba)
+values = random_tune()
 pack_values(values)
 

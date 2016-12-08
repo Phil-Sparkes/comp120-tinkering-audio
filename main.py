@@ -1,8 +1,8 @@
 import wave
 import struct
 
-noise_out = wave.open('noise2.wav', 'w')
-soundWave = wave.open('Roomba.wav', 'r')
+noise_out = wave.open('noise3.wav', 'w')
+soundWave = wave.open('noise.wav', 'r')
 
 # mode must be 'r', 'rb', 'w', or 'wb'
 
@@ -99,10 +99,14 @@ def count_sign_changes():
     numzero /= 2
     return numzero
 
+def less_frequency(frames):
+
+    pass
+
 #BitDepth = 2**15 - 1
 #Volume = float(max()) / float(BitDepth)
 
-create_echo(frames, 8000)
-
+#create_echo(frames, 8000)
+#less_frequency(frames)
 #double(frames)
-#half(frames)
+half(frames)
