@@ -15,11 +15,8 @@ noise_out.setcomptype('NONE', 'not compressed')
 Channels = noise_out.getnchannels()
 
 
-<<<<<<< HEAD
 
 
-=======
->>>>>>> 0bdbf982b0014653681c22ff1b34693c476d11e4
 def sine_wave(frequency, volume, attack_time, decay_time, sustain_time, release_time):
     """Envelope function, plays a pure tone but fades into and out of it"""
     # Creates volume_change as a float
@@ -101,10 +98,6 @@ twinkle = ['c2', 'c2', 'g2', 'g2', 'a3', 'a3', 'g2',
            'BLANK', 'g2', 'g2', 'f2', 'f2', 'e2', 'e2', 'd2',
            'BLANK', 'g2', 'g2', 'f2', 'f2', 'e2', 'e2', 'd2']
 
-<<<<<<< HEAD
-=======
-# New tune in list form
->>>>>>> 0bdbf982b0014653681c22ff1b34693c476d11e4
 roomba = ['BLANK', 'c2', 'c2', 'd2', 'f2', 'd2', 'g2', 'g2',
           'BLANK', 'c2', 'c2', 'a2', 'a2', 'b2', 'c2', 'd2',
           'BLANK', 'e2', 'g2', 'f2', 'f2', 'g2', 'd2', 'd2']
@@ -179,13 +172,7 @@ def pack_values(values):
     value_str = ''.join(output_values)
     noise_out.writeframes(value_str)
 
-<<<<<<< HEAD
 #values = play_notes(roomba)
 values = random_tune()
-=======
-
-values = play_notes(roomba)
-#values = random_tune()
->>>>>>> 0bdbf982b0014653681c22ff1b34693c476d11e4
 pack_values(values)
 
