@@ -15,8 +15,6 @@ noise_out.setcomptype('NONE', 'not compressed')
 Channels = noise_out.getnchannels()
 
 
-
-
 def sine_wave(frequency, volume, attack_time, decay_time, sustain_time, release_time):
     """Envelope function, plays a pure tone but fades into and out of it"""
     # Creates volume_change as a float
@@ -98,6 +96,7 @@ twinkle = ['c2', 'c2', 'g2', 'g2', 'a3', 'a3', 'g2',
            'BLANK', 'g2', 'g2', 'f2', 'f2', 'e2', 'e2', 'd2',
            'BLANK', 'g2', 'g2', 'f2', 'f2', 'e2', 'e2', 'd2']
 
+# New tune in list form
 roomba = ['BLANK', 'c2', 'c2', 'd2', 'f2', 'd2', 'g2', 'g2',
           'BLANK', 'c2', 'c2', 'a2', 'a2', 'b2', 'c2', 'd2',
           'BLANK', 'e2', 'g2', 'f2', 'f2', 'g2', 'd2', 'd2']
@@ -136,7 +135,6 @@ def play_notes(note_list):
 
 def random_tune():
     """ Generates a random tune"""
-
     values = []
 
     for note in range(40):
@@ -154,7 +152,7 @@ def random_tune():
 
 
 def drum_beat():
-    """drum beat work in progress"""
+    """creates a drum beat sound"""
     values = []
     for i in xrange(1000):
         value = math.sin(2.0 * math.pi * 120 * (i/44100.0)) * (0.5 * (2 ** 15 - 1))
@@ -163,7 +161,7 @@ def drum_beat():
 
 
 def pack_values(values):
-    """Packages the and appends the values"""
+    """Packages and appends the values"""
     output_values = []
     for value in values:
         packaged_value = struct.pack("<h", value)
@@ -175,4 +173,3 @@ def pack_values(values):
 #values = play_notes(roomba)
 values = random_tune()
 pack_values(values)
-

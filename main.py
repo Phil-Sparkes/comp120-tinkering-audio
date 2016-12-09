@@ -3,15 +3,15 @@ import struct
 
 noise_out = wave.open('noise3.wav', 'w')
 soundWave = wave.open('noise.wav', 'r')
-
 # mode must be 'r', 'rb', 'w', or 'wb'
 
+# Gets the parameters of the sound file and creates a new one with the same parameters
 length = soundWave.getnframes()
 frames = []
-
 params = soundWave.getparams()
 noise_out.setparams(params)
 
+# Unpacks the sound file
 for i in xrange(length):
     wave_data = soundWave.readframes(1)
     data = struct.unpack("<h", wave_data)
@@ -19,13 +19,16 @@ for i in xrange(length):
 
 
 def create_echo(sound_file, delay):
+    """Creates an echo sound effect"""
     values = []
     channels = 1
     s1 = sound_file
     s2 = sound_file[:]
     for index in range(delay, len(s1)):
+        # 0.6 relating to the sound level of the echo
         echo = 0.6*s2[index-delay]
         s1[index] += echo
+        # Packages the values
         packaged_value = struct.pack("<h", s1[index])
         for j in xrange(channels):
             values.append(packaged_value)
@@ -36,6 +39,7 @@ def create_echo(sound_file, delay):
 
 
 def double(source):
+    """doubles the speed"""
     values = []
     channels = 2
     length = len(source) / 2 + 1
@@ -55,6 +59,7 @@ def double(source):
 
 
 def half(source):
+    """halves the speed"""
     values = []
     channels = 2
     length = len(source) * 2
@@ -99,14 +104,7 @@ def count_sign_changes():
     numzero /= 2
     return numzero
 
-def less_frequency(frames):
 
-    pass
-
-#BitDepth = 2**15 - 1
-#Volume = float(max()) / float(BitDepth)
-
-#create_echo(frames, 8000)
-#less_frequency(frames)
+create_echo(frames, 8000)
 #double(frames)
-half(frames)
+#half(frames)
